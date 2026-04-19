@@ -10,9 +10,9 @@ class AircraftViewSet(ModelViewSet):
     queryset = Aircraft.objects.all()
     serializer_class = AircraftSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['model']
-    search_fields = ['model']
-    ordering_fields = ['model']
+    filterset_fields = ['models']
+    search_fields = ['models']
+    ordering_fields = ['models']
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
