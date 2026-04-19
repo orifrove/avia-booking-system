@@ -5,6 +5,8 @@ from decouple import config
 
 load_dotenv()
 
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'change-me')
@@ -22,6 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'corsheaders',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'django_filters',
     'drf_spectacular',
     'apps.users',
@@ -62,6 +68,8 @@ TEMPLATES = [
     },
 ]
 
+
+
 WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
@@ -82,7 +90,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLength,Validator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -101,11 +109,15 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES" : [
+        "rest_framework.permissions.AllowAny",
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 from datetime import timedelta
 
@@ -117,6 +129,14 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
     "TOKEN_OBTAIN_SERIALIZER": "api.serializers.MyTokenObteinPariSerializer",
 }
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Blog API Project",
+    "DESCRIPTION": "A simple blog to learn about DRF",
+    "VERSION": "1.0.0",
+}
+
 
 CORS_ALOWWED_ORGINS = {
     "http://localhost:8000"
