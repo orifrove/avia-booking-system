@@ -1,13 +1,22 @@
 from rest_framework.viewsets import ModelViewSet
-from .models import Aircraft
-from .serializers import AircraftSerializer
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from .models import Aircraft
+from .serializers import AircraftSerializer
+
 
 class AircraftViewSet(ModelViewSet):
     queryset = Aircraft.objects.all()
     serializer_class = AircraftSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["models"]
-    search_fields = ["models"]
-    ordering_fields = ["models"]
+    filterset_fields = ['model']
+    search_fields = ['model']
+    ordering_fields = ['model']
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        elif self.action == 'destroy':
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
