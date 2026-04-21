@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'django_filters',
+    'django-cors-headers',
     'drf_spectacular',
     'apps.users',
     'apps.flights',
@@ -145,3 +146,7 @@ CORS_ALOWWED_ORGINS = {
     "http://localhost:8000"
     "http://localhost:3000"
 }
+
+INSTALLED_APPS += ['corsheaders']
+MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
+CORS_ALLOW_ALL_ORIGINS = True
