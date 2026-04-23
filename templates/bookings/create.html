@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Бронирование — AviaCo{% endblock %}
+{% block content %}
+<section class="detail-section">
+  <div class="detail-card">
+    <div class="modal-title">НОВОЕ БРОНИРОВАНИЕ</div>
+    <div class="detail-rows">
+      <div class="detail-row">
+        <span class="detail-label">Рейс</span>
+        <span class="detail-value">{{ flight.number_of_race }} — {{ flight.from_city }} → {{ flight.to_city }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Дата</span>
+        <span class="detail-value">{{ flight.flight_date }} {{ flight.flight_time }}</span>
+      </div>
+    </div>
+    <form method="post" class="booking-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Имя пассажира</label>
+        <input type="text" name="username" required placeholder="Иван Иванов">
+      </div>
+      <div class="form-group">
+        <label>Паспорт</label>
+        <input type="text" name="passport" required placeholder="AA1234567">
+      </div>
+      <div class="form-group">
+        <label>Телефон</label>
+        <input type="text" name="phone" required placeholder="901234567">
+      </div>
+      <div class="form-actions">
+        <a href="{% url 'flights:list' %}" class="btn-outline">← Назад</a>
+        <button type="submit" class="btn-primary">Забронировать</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

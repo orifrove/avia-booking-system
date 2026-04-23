@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация — AviaCo{% endblock %}
+{% block content %}
+<section class="detail-section">
+  <div class="detail-card">
+    <div class="modal-title">РЕГИСТРАЦИЯ</div>
+    <form method="post" class="booking-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" name="password1" required placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label>Повторите пароль</label>
+        <input type="password" name="password2" required placeholder="••••••••">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Зарегистрироваться</button>
+        <a href="/login/" class="btn-outline">Уже есть аккаунт</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

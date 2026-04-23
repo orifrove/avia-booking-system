@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Самолёты — AviaCo{% endblock %}
+{% block content %}
+<section class="flights-section">
+  <div class="section-header">
+    <h1 class="section-title">— САМОЛЁТЫ</h1>
+    <span class="section-count">{{ aircraft|length }} всего</span>
+  </div>
+  <div class="flights-grid">
+    {% for plane in aircraft %}
+    <div class="flight-card">
+      <div class="flight-number">✈ {{ plane.models }}</div>
+    </div>
+    {% empty %}
+    <div class="empty-msg">Самолётов нет</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Бронирования — AviaCo{% endblock %}
+{% block content %}
+<section class="flights-section">
+  <div class="section-header">
+    <h1 class="section-title">— МОИ БРОНИРОВАНИЯ</h1>
+    <span class="section-count">{{ bookings|length }} всего</span>
+  </div>
+  <div class="flights-grid">
+    {% for booking in bookings %}
+    <div class="flight-card">
+      <div class="flight-number">Бронь #{{ booking.id }}</div>
+      <div class="detail-rows">
+        <div class="detail-row">
+          <span class="detail-label">Пассажир</span>
+          <span class="detail-value">{{ booking.username }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Паспорт</span>
+          <span class="detail-value">{{ booking.passport }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Телефон</span>
+          <span class="detail-value">{{ booking.phone }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Рейс</span>
+          <span class="detail-value">#{{ booking.flights_id }}</span>
+        </div>
+      </div>
+      <div class="flight-actions">
+        <a href="{% url 'bookings:delete' booking.pk %}" class="btn-outline" style="color:var(--red);border-color:var(--red)">Отменить</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-msg">Бронирований нет</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

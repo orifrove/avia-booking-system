@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}AviaCo — Главная{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">ДОБРО ПОЖАЛОВАТЬ</div>
+    <h1 class="hero-title">ЛЕТИТЕ<br>КУДА ХОТИТЕ</h1>
+    <p class="hero-sub">Бронируйте рейсы быстро и удобно</p>
+    <div class="hero-actions">
+      <a href="/flights/" class="btn-primary">Найти рейс</a>
+      <a href="/bookings/" class="btn-outline">Мои бронирования</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <div class="stat-num">{{ flights_count }}</div>
+      <div class="stat-label">РЕЙСОВ</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ bookings_count }}</div>
+      <div class="stat-label">БРОНИРОВАНИЙ</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ aircraft_count }}</div>
+      <div class="stat-label">САМОЛЁТОВ</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

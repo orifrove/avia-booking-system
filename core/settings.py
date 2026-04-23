@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'django_filters',
-    'django-cors-headers',
     'drf_spectacular',
     'apps.users',
     'apps.flights',
@@ -56,7 +55,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -147,6 +146,5 @@ CORS_ALOWWED_ORGINS = {
     "http://localhost:3000"
 }
 
-INSTALLED_APPS += ['corsheaders']
-MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware')
 CORS_ALLOW_ALL_ORIGINS = True
+STATICFILES_DIRS = [BASE_DIR / 'static']

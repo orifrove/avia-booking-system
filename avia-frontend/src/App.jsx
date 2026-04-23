@@ -1,92 +1,268 @@
-import FlightList from './components/FlightList';
-import { Plane, Search, Calendar, User, LayoutGrid, BarChart3, Bell, Menu } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import './index.css'
 
-function App() {
+const API = 'http://127.0.0.1:8000/api'
+
+export default function App() {
+  const [flights, setFlights] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [selected, setSelected] = useState(null)
+  const [search, setSearch] = useState('')
+  const [fromCity, setFromCity] = useState('')
+  const [toCity, setToCity] = useState('')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [stats, setStats] = useState({ flights: 0, cities: 0, aircraft: 0 })
+
+  useEffect(() => {
+    fetchFlights()
+  }, [page, search, fromCity, toCity])
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const [f, a] = await Promise.all([
+        fetch(`${API}/flights/`),
+        fetch(`${API}/aircraft/`)
+      ])
+      const fd = await f.json()
+      const ad = await a.json()
+      const allFlights = fd.results || fd
+      const cities = new Set()
+      allFlights.forEach(f => { cities.add(f.from_city); cities.add(f.to_city) })
+      setStats({
+        flights: fd.count || allFlights.length,
+        cities: cities.size,
+        aircraft: ad.count || (ad.results || ad).length
+      })
+    } catch {}
+  }
+
+  const fetchFlights = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      let url = `${API}/flights/?page=${page}`
+      if (search) url += `&search=${search}`
+      if (fromCity) url += `&from_city=${fromCity}`
+      if (toCity) url += `&to_city=${toCity}`
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Ошибка загрузки')
+      const data = await res.json()
+      if (data.results) {
+        setFlights(data.results)
+        setTotalPages(Math.ceil(data.count / 5))
+      } else {
+        setFlights(data)
+      }
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = (e) => {
+    e.preventDefault()
+    setPage(1)
+    fetchFlights()
+  }
+
   return (
-    <div className="min-h-screen bg-[#FDFEFE] font-['Geist_Mono',sans-serif] text-slate-900 antialiased overflow-x-hidden">
-      
-      {/* ПРЕМИАЛЬНЫЙ НАВИГАТОР */}
-      <nav className="fixed top-0 left-0 right-0 h-[80px] bg-white/60 backdrop-blur-3xl border-b border-slate-100 z-[100] px-6 md:px-12 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-[45px] h-[45px] bg-sky-600 rounded-3xl flex items-center justify-center shadow-lg shadow-sky-500/20">
-              <Plane className="w-5 h-5 text-white rotate-[-15deg]"/>
-            </div>
-            <h1 className="text-2xl font-black italic tracking-[-0.07em] uppercase">Sky<span className="text-sky-600">Flow</span></h1>
-            <span className="hidden md:inline bg-sky-50 text-sky-700 text-[10px] font-bold px-2.5 py-1 rounded-full ml-1">Beta 0.8</span>
-          </div>
-
-          <div className="hidden lg:flex items-center gap-1.5 p-1.5 bg-slate-50 border border-slate-100 rounded-full">
-              {[ { name: 'Dashboard', icon: LayoutGrid }, { name: 'My Flights', icon: Plane }, { name: 'Statistics', icon: BarChart3 } ].map((item, idx) => (
-                  <button key={item.name} className={`${idx === 0 ? 'bg-white text-slate-900 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-800'} flex items-center gap-2 px-6 py-2 rounded-full text-xs font-bold transition-all`}>
-                    <item.icon className="w-4 h-4" /> {item.name}
-                  </button>
-              ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-              <button className="hidden sm:flex w-12 h-12 rounded-full bg-slate-50 border border-slate-100 items-center justify-center text-slate-400 hover:border-slate-200 transition-colors">
-                  <Bell className="w-5 h-5" />
-              </button>
-              <button className="flex items-center gap-2.5 bg-slate-900 px-7 py-3 rounded-full text-white text-sm font-bold shadow-lg shadow-slate-900/10 hover:shadow-xl hover:shadow-slate-900/20 active:scale-[0.97] transition-all">
-                  <User className="w-5 h-5" /> profile
-              </button>
-               <button className="flex lg:hidden w-12 h-12 rounded-full bg-slate-50 border border-slate-100 items-center justify-center text-slate-600">
-                  <Menu className="w-5 h-5" />
-              </button>
-          </div>
+    <>
+      {/* NAV */}
+      <nav>
+        <div className="nav-logo">AVIA<span>CO</span></div>
+        <ul className="nav-links">
+          <li><a href="#" className="active">Рейсы</a></li>
+          <li><a href="#">Бронирование</a></li>
+          <li><a href="#">О нас</a></li>
+        </ul>
+        <button className="nav-btn">Войти</button>
       </nav>
 
-      {/* ГЛАВНЫЙ КОНТЕНТ */}
-      <main className="max-w-[1700px] mx-auto pt-[130px] pb-32 px-6 md:px-12">
-        <header className="mb-20 grid grid-cols-1 xl:grid-cols-[1fr,450px] gap-12 items-end">
-            <div>
-              <div className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] mb-3">#AVIA.GLOBAL</div>
-              <h2 className="text-6xl md:text-7xl font-black tracking-[-0.05em] leading-[0.9] max-w-[900px]">
-                Найди свой идеальный <span className="text-sky-600 relative">маршрут <div className="absolute left-0 bottom-[10px] w-full h-[6px] bg-sky-200 rounded-full -z-10"></div></span>. В любое время.
-              </h2>
-            </div>
-            <p className="text-slate-500 font-medium text-lg leading-relaxed max-w-[450px] self-end xl:mb-1">
-              SkyFlow Core™ — это премиальный сервис бронирования, созданный для тех, кто ценит время, комфорт и безупречный цифровой опыт.
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-grid">
+          <div>
+            <h1 className="hero-title">
+              ЛЕТИТЕ<br />
+              <span className="accent">ВЫШЕ</span><br />
+              МЕЧТАЙТЕ
+            </h1>
+            <p className="hero-sub">
+              Бронируйте рейсы по всему миру. Лучшие цены, комфортные перелёты, незабываемые путешествия.
             </p>
-        </header>
-
-        {/* СЕКЦИЯ ПОИСКА (Бенто Дизайн) */}
-        <section className="bg-white p-12 rounded-[40px] shadow-2xl shadow-slate-200/40 border border-slate-100 mb-20 grid grid-cols-1 md:grid-cols-[1fr,1fr,1fr,auto] gap-8">
-            {[ { icon: MapPin, title: 'From', value: 'New York (JFK)', sub: 'John F. Kennedy Intl' }, { icon: MapPin, title: 'To', value: 'San Francisco (SFO)', sub: 'San Francisco Intl' }, { icon: Calendar, title: 'Date', value: 'Dec 12, 2026', sub: 'One Way' } ].map((item, idx) => (
-                <div key={idx} className="flex gap-4 items-start pt-1">
-                    <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
-                        <item.icon className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <div className="text-[11px] font-black text-slate-300 uppercase tracking-widest">{item.title}</div>
-                        <p className="text-xl font-bold text-slate-800">{item.value}</p>
-                        <p className="text-sm font-medium text-slate-400 mt-0.5">{item.sub}</p>
-                    </div>
-                </div>
-            ))}
-            <button className="w-full md:w-auto px-10 py-5 h-[68px] bg-slate-900 rounded-[20px] text-white font-black uppercase text-xs tracking-widest hover:bg-sky-600 transition-colors flex items-center justify-center gap-3">
-                <Search className="w-4 h-4" /> search flights
-            </button>
-        </section>
-        
-        {/* СПИСОК РЕЙСОВ */}
-        <div className="mb-10 flex justify-between items-center">
-            <h3 className="text-2xl font-black tracking-tighter">Найдено 115 рейсов</h3>
-            <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-100 rounded-full">
-                {['Price', 'Duration', 'Departure'].map((item, idx) => (
-                    <button key={item} className={`${idx === 0 ? 'bg-slate-100 text-slate-800' : 'text-slate-500 hover:text-slate-800'} px-5 py-2 rounded-full text-xs font-bold`}>
-                        Sort by {item}
-                    </button>
-                ))}
+            <div className="hero-btns">
+              <button className="btn-primary" onClick={() => document.querySelector('.search-section').scrollIntoView({behavior:'smooth'})}>
+                Найти рейс
+              </button>
+              <button className="btn-outline">Узнать больше</button>
             </div>
+          </div>
+          <div className="hero-stats">
+            <div className="stat-card">
+              <div className="stat-num">{stats.flights}+</div>
+              <div className="stat-label">Активных рейсов</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-num">{stats.cities}+</div>
+              <div className="stat-label">Направлений</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-num">{stats.aircraft}+</div>
+              <div className="stat-label">Воздушных судов</div>
+            </div>
+          </div>
         </div>
-        
-        <FlightList />
-      </main>
-    </div>
-  );
+      </section>
+
+      {/* SEARCH */}
+      <section className="search-section">
+        <div className="search-wrap">
+          <div className="search-title">— ПОИСК РЕЙСОВ</div>
+          <form className="search-form" onSubmit={handleSearch}>
+            <div className="form-group">
+              <label>Откуда</label>
+              <input
+                type="text"
+                placeholder="Ташкент"
+                value={fromCity}
+                onChange={e => setFromCity(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Куда</label>
+              <input
+                type="text"
+                placeholder="Москва"
+                value={toCity}
+                onChange={e => setToCity(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Поиск</label>
+              <input
+                type="text"
+                placeholder="Номер рейса, город..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
+            <button type="submit" className="btn-primary">Найти</button>
+          </form>
+        </div>
+      </section>
+
+      {/* FLIGHTS */}
+      <section className="flights-section">
+        <div className="section-header">
+          <h2 className="section-title">— РЕЙСЫ</h2>
+          <span className="section-count">{flights.length} найдено</span>
+        </div>
+
+        {loading && (
+          <div className="loading">
+            <span/><span/><span/>
+          </div>
+        )}
+
+        {error && <div className="error-msg">⚠ {error}</div>}
+
+        {!loading && !error && flights.length === 0 && (
+          <div className="empty-msg">Рейсы не найдены</div>
+        )}
+
+        {!loading && !error && (
+          <div className="flights-grid">
+            {flights.map((flight, i) => (
+              <div
+                key={flight.id}
+                className="flight-card"
+                style={{ animationDelay: `${i * 0.08}s` }}
+                onClick={() => setSelected(flight)}
+              >
+                <div className="flight-number">{flight.number_of_race}</div>
+                <div className="flight-route">
+                  <div className="flight-city">{flight.from_city?.slice(0,3).toUpperCase()}</div>
+                  <div className="flight-arrow">✈</div>
+                  <div className="flight-city">{flight.to_city?.slice(0,3).toUpperCase()}</div>
+                </div>
+                <div className="flight-meta">
+                  <div>
+                    <div className="flight-time">{flight.flight_date}</div>
+                    <div className="flight-time">{flight.flight_time}</div>
+                  </div>
+                  {flight.price && (
+                    <div className="flight-price">${flight.price}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i+1}
+                className={`page-btn ${page === i+1 ? 'active' : ''}`}
+                onClick={() => setPage(i+1)}
+              >
+                {i+1}
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* MODAL */}
+      {selected && (
+        <div className="modal-overlay" onClick={() => setSelected(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setSelected(null)}>×</button>
+            <div className="modal-title">ДЕТАЛИ РЕЙСА</div>
+            <div className="modal-row">
+              <span className="modal-label">Номер рейса</span>
+              <span className="modal-value">{selected.number_of_race}</span>
+            </div>
+            <div className="modal-row">
+              <span className="modal-label">Откуда</span>
+              <span className="modal-value">{selected.from_city}</span>
+            </div>
+            <div className="modal-row">
+              <span className="modal-label">Куда</span>
+              <span className="modal-value">{selected.to_city}</span>
+            </div>
+            <div className="modal-row">
+              <span className="modal-label">Дата</span>
+              <span className="modal-value">{selected.flight_date}</span>
+            </div>
+            <div className="modal-row">
+              <span className="modal-label">Время</span>
+              <span className="modal-value">{selected.flight_time}</span>
+            </div>
+            {selected.price && (
+              <div className="modal-price">${selected.price}</div>
+            )}
+            <button className="btn-primary" style={{width:'100%', marginTop:'1rem'}}>
+              Забронировать
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* FOOTER */}
+      <footer>
+        <div className="footer-logo">AVIACO</div>
+        <div className="footer-copy">© 2026 AviaCo. Все права защищены.</div>
+      </footer>
+    </>
+  )
 }
-
-import { MapPin } from 'lucide-react';
-
-export default App;

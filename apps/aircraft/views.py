@@ -37,3 +37,11 @@ class AircraftViewSet(ModelViewSet):
 class CustomPagination(PageNumberPagination):
     page_query_param = 'p'
 
+
+from django.views.generic import ListView
+from .models import Aircraft
+
+class AircraftListView(ListView):
+    model = Aircraft
+    template_name = 'aircraft/list.html'
+    context_object_name = 'aircraft'

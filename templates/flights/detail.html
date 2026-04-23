@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Рейс {{ flight.number_of_race }} — AviaCo{% endblock %}
+{% block content %}
+<section class="detail-section">
+  <div class="detail-card">
+    <div class="flight-number">{{ flight.number_of_race }}</div>
+    <div class="flight-route">
+      <div class="flight-city">{{ flight.from_city|upper }}</div>
+      <div class="flight-arrow">✈</div>
+      <div class="flight-city">{{ flight.to_city|upper }}</div>
+    </div>
+    <div class="detail-rows">
+      <div class="detail-row">
+        <span class="detail-label">Дата</span>
+        <span class="detail-value">{{ flight.flight_date }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Время</span>
+        <span class="detail-value">{{ flight.flight_time }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Самолёт</span>
+        <span class="detail-value">{{ flight.aircraft_id }}</span>
+      </div>
+    </div>
+    <div class="detail-actions">
+      <a href="{% url 'flights:list' %}" class="btn-outline">← Назад</a>
+      <a href="{% url 'bookings:create' flight.pk %}" class="btn-primary">Забронировать</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

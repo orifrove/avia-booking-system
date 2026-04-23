@@ -1,7 +1,12 @@
 from rest_framework.routers import DefaultRouter
-from .views import AircraftViewSet
+from django.urls import path
+from .views import AircraftViewSet, AircraftListView
+
+app_name = 'aircraft'
 
 router = DefaultRouter()
-router.register('', AircraftViewSet)
+router.register('api', AircraftViewSet)
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('', AircraftListView.as_view(), name='list'),
+] + router.urls

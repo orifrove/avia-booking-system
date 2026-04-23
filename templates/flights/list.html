@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Рейсы — AviaCo{% endblock %}
+{% block content %}
+<section class="flights-section">
+  <div class="section-header">
+    <h1 class="section-title">— РЕЙСЫ</h1>
+    <span class="section-count">{{ flights|length }} найдено</span>
+  </div>
+
+  <form class="search-form" method="get">
+    <div class="form-group">
+      <label>Откуда</label>
+      <input type="text" name="from_city" value="{{ request.GET.from_city }}" placeholder="Ташкент">
+    </div>
+    <div class="form-group">
+      <label>Куда</label>
+      <input type="text" name="to_city" value="{{ request.GET.to_city }}" placeholder="Москва">
+    </div>
+    <div class="form-group">
+      <label>Дата</label>
+      <input type="text" name="flight_date" value="{{ request.GET.flight_date }}" placeholder="2026-04-15">
+    </div>
+    <button type="submit" class="btn-primary">Найти</button>
+  </form>
+
+  <div class="flights-grid">
+    {% for flight in flights %}
+    <div class="flight-card">
+      <div class="flight-number">{{ flight.number_of_race }}</div>
+      <div class="flight-route">
+        <div class="flight-city">{{ flight.from_city|slice:":3"|upper }}</div>
+        <div class="flight-arrow">✈</div>
+        <div class="flight-city">{{ flight.to_city|slice:":3"|upper }}</div>
+      </div>
+      <div class="flight-meta">
+        <div>
+          <div class="flight-time">{{ flight.flight_date }}</div>
+          <div class="flight-time">{{ flight.flight_time }}</div>
+        </div>
+      </div>
+      <div class="flight-actions">
+        <a href="{% url 'flights:detail' flight.pk %}" class="btn-outline">Подробнее</a>
+        <a href="{% url 'bookings:create' flight.pk %}" class="btn-primary">Забронировать</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-msg">Рейсы не найдены</div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_other_pages %}
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">←</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      <a href="?page={{ num }}" class="page-btn {% if page_obj.number == num %}active{% endif %}">{{ num }}</a>
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="page-btn">→</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

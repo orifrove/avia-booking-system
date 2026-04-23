@@ -61,3 +61,45 @@ class ProfileView(APIView):
 class CustomPagination(PageNumberPagination):
     page_query_param = 'p'
 
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
+from django.views import View
+
+class LoginPageView(View):
+    def get(self, request):
+        return render(request, 'users/login.html')
+
+    def post(self, request):
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, username=email, password=password)
+        if user:
+            login(request, user)
+            return redirect('/flights/')
+        messages.error(request, 'Неверный email или пароль')
+        return render(request, 'users/login.html')
+
+class RegisterPageView(View):
+    def get(self, request):
+        return render(request, 'users/register.html')
+
+    def post(self, request):
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        if password1 != password2:
+            messages.error(request, 'Пароли не совпадают')
+            return render(request, 'users/register.html')
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Email уже занят')
+            return render(request, 'users/register.html')
+        user = User.objects.create_user(username=email, email=email, password=password1)
+        login(request, user)
+        return redirect('/flights/')
+
+class LogoutPageView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('/flights/')
