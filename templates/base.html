@@ -18,7 +18,7 @@
   <div class="nav-auth">
     {% if user.is_authenticated %}
       <span class="nav-user">{{ user.email }}</span>
-      <a href="/login/logout/" class="nav-btn-outline">Выйти</a>
+      <a href="/logout/" class="nav-btn-outline">Выйти</a>
     {% else %}
       <a href="/login/" class="nav-btn">Войти</a>
     {% endif %}
